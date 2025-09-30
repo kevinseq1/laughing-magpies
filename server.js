@@ -2,7 +2,8 @@
 
 // 1. Import the express modules
 const express = require('express');
-const todoRoutes = require('./routes/todoRoutes'); // 1. Import the new router
+const todoRoutes = require('./routes/todoRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 const PORT = 3000;
@@ -10,7 +11,8 @@ const PORT = 3000;
 // 2. MIDDLEWARE: Tell Express to parse incoming JSON bodies (Crucial for POST/PUT)
 app.use(express.json());
 
-// 3. Mount the router: All requests to '/api/todos' will go to todoRoutes
+// 3. Mount the router
+app.use('/api', userRoutes)
 app.use('/api/todos', todoRoutes); 
 
 
