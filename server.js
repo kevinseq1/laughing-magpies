@@ -1,12 +1,14 @@
 // server.js
 
+require('dotenv').config();
+
 // 1. Import the express modules
 const express = require('express');
 const todoRoutes = require('./routes/todoRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // 2. MIDDLEWARE: Tell Express to parse incoming JSON bodies (Crucial for POST/PUT)
 app.use(express.json());

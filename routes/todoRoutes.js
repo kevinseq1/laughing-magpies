@@ -3,6 +3,10 @@
 const express = require('express');
 const router = express.Router();
 const todoController = require('../controllers/todoController');
+const authenticateToken = require('../middleware/authMiddleware');
+
+// Apply middleware to all To-Do routes
+router.use(authenticateToken); 
 
 // Define the routes:
 // GET /api/todos -> Call the getAllTodos function

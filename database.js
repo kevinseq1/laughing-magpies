@@ -14,7 +14,9 @@ const db = new sqlite3.Database(DB_PATH, sqlite3.OPEN_READWRITE | sqlite3.OPEN_C
             CREATE TABLE IF NOT EXISTS todos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
-                completed BOOLEAN NOT NULL DEFAULT 0
+                completed BOOLEAN NOT NULL DEFAULT 0,
+                user_id INTEGER, 
+                FOREIGN KEY(user_id) REFERENCES users(id) 
             )
         `, (err) => {
             if (err) {

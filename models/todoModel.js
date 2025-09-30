@@ -1,35 +1,41 @@
 // models/todoModel.js
 
-const db = require('../database'); 
+const db = require('../database');
 
 class TodoModel {
-    // Logic to fetch all to-dos
-    getAll() {
+    /**
+     * Gets all todos for a specific user.
+     * @param {number} userId
+     */
+    getAll(userId) { 
         return new Promise((resolve, reject) => {
-            // db.all runs the query, and we handle the callback results in the Promise
-            db.all('SELECT * FROM todos ORDER BY id DESC', (err, rows) => {
+            // 1. Only select todos where user_id matches
+            db.all('SELECT * FROM todos WHERE user_id = ? ORDER BY id DESC', [userId], (err, rows) => {
                 if (err) {
-                    return reject(err); // Reject the promise on error
+                    return reject(err);
                 }
-                resolve(rows); // Resolve the promise with data on success
+                resolve(rows);
             });
         });
     }
 
-    // Logic to add a new to-do
-    add(title) {
+    /**
+     * Adds a new todo for a specific user.
+     * @param {string} title
+     * @param {number} userId
+     */
+    add(title, userId) { 
         return new Promise((resolve, reject) => {
-            db.run('INSERT INTO todos (title, completed) VALUES (?, ?)', [title, 0], function(err) {
+            // 2. Insert the user_id with the new todo
+            db.run('INSERT INTO todos (title, completed, user_id) VALUES (?, ?, ?)', [title, 0, userId], function(err) {
                 if (err) {
                     return reject(err);
                 }
-                // The 'this.lastID' property holds the auto-generated ID
-                const newTodo = { id: this.lastID, title: title, completed: 0 };
+                const newTodo = { id: this.lastID, title: title, completed: 0, user_id: userId };
                 resolve(newTodo);
             });
         });
     }
 }
 
-// Export a single instance of the model
 module.exports = new TodoModel();

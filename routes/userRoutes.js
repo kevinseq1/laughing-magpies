@@ -8,4 +8,8 @@ const userController = require('../controllers/userController');
 // POST /api/register
 router.post('/register', userController.register);
 
+// Define the login route
+// POST /api/login
+router.post('/login', userController.login);
+
 module.exports = router;
