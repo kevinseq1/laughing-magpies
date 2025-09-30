@@ -27,6 +27,21 @@ const db = new sqlite3.Database(DB_PATH, sqlite3.OPEN_READWRITE | sqlite3.OPEN_C
                 db.run("INSERT INTO todos (title, completed) VALUES (?, ?)", ["Refactor Model layer with Promises", 0]);
             }
         });
+
+        db.run(`
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE,
+                email TEXT NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL
+            )
+        `, (err) => {
+            if (err) {
+                console.error("Error creating users table:", err.message);
+            } else {
+                console.log("Users table initialized.");
+            }
+        });
     }
 });
 
