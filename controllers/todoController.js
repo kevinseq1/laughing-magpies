@@ -5,20 +5,31 @@ const todoModel = require('../models/todoModel'); // *** Note the change: ../mod
 
 class TodoController {
     // Handler for GET /api/todos
-    getAllTodos(req, res) {
-        const todos = todoModel.getAll();
-        res.json(todos);
+    async getAllTodos(req, res) { // <-- Make function async
+        try {
+            const todos = await todoModel.getAll(); // <-- Await the promise
+            res.json(todos);
+        } catch (error) {
+            console.error('Error fetching todos:', error);
+            res.status(500).json({ error: 'Failed to retrieve to-dos' });
+        }
     }
 
     // Handler for POST /api/todos
-    addTodo(req, res) {
-        // The title would come from the request body (req.body.title)
-        // For simplicity now, let's hardcode it until we introduce body parsing
-        const title = "New task via POST (simulated)"; 
-        
-        const newTodo = todoModel.add(title);
-        // Respond with the newly created resource and a 201 status
-        res.status(201).json(newTodo);
+    async addTodo(req, res) { // <-- Make function async
+        try {
+            const { title } = req.body; 
+
+            if (!title) {
+                return res.status(400).json({ error: 'Title is required' });
+            }
+
+            const newTodo = await todoModel.add(title); // <-- Await the promise
+            res.status(201).json(newTodo);
+        } catch (error) {
+            console.error('Error adding todo:', error);
+            res.status(500).json({ error: 'Failed to add to-do' });
+        }
     }
 }
 
