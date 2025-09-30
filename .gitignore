@@ -4,4 +4,5 @@ dist
 dev.db
 *.sqlite
 blog.db
+*.db
 

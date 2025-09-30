@@ -1,11 +1,6 @@
 // models/todoModel.js
 
-// 1. In-memory array to simulate the database
-let todos = [
-    { id: 1, title: 'Learn MVC architecture', completed: true },
-    { id: 2, title: 'Practice Node.js networking', completed: false },
-];
-let nextId = 3; // Counter for new items
+const db = require('../database'); 
 
 class TodoModel {
     // Logic to fetch all to-dos
