@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Full Stack Integration Client</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; display: flex; gap: 20px; }
+        #chat-container { flex: 2; border-right: 1px solid #ccc; padding-right: 20px; }
+        #scoreboard-container { flex: 1; padding: 10px; background: #f9f9f9; border-radius: 5px; }
+        #messages { list-style-type: none; padding: 0; max-height: 400px; overflow-y: scroll; }
+        #messages li { padding: 5px 10px; border-bottom: 1px solid #eee; }
+        #input-form { display: flex; margin-top: 10px; }
+        #input-form input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; }
+        #input-form button { background: #5cb85c; color: white; border: none; padding: 10px 15px; cursor: pointer; }
+        .score-row { padding: 5px 0; border-bottom: 1px dotted #ccc; }
+        .score-row:first-child { font-weight: bold; color: gold; } /* Highlight the top score! ✨ */
+    </style>
+</head>
+<body>
+    
+    <div id="chat-container">
+        <h1>Real-Time Chat 💬</h1>
+        <ul id="messages"></ul>
+        <form id="input-form">
+            <input id="m" autocomplete="off" placeholder="Type a message..." /><button>Send</button>
+        </form>
+    </div>
+
+    <div id="scoreboard-container">
+        <h1>Top 10 Scoreboard 🏅</h1>
+        <div id="scores-list">No scores submitted yet.</div>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io(); 
+
+        // Chat elements
+        const form = document.getElementById('input-form');
+        const input = document.getElementById('m');
+        const messages = document.getElementById('messages');
+        
+        // Scoreboard element
+        const scoresList = document.getElementById('scores-list');
+
+        // =================================================================
+        // CHAT LOGIC (Sending and Receiving)
+        // =================================================================
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('chat message', input.value); // emit the input message to the chat message event of the server
+                input.value = '';
+            }
+        });
+
+        // Handle chat message event from the server
+        socket.on('chat message', function(msg) {
+            const item = document.createElement('li');
+            item.textContent = `[${msg.user.substring(0, 4)}...] ${msg.content}`;
+            messages.appendChild(item);
+            messages.scrollTop = messages.scrollHeight; // Scroll to bottom
+        });
+
+        // Handle connect and disconnect message io events from the server
+        socket.on('message', function(data) {
+            const item = document.createElement('li');
+            item.style.color = 'blue';
+            item.textContent = `[${data.user}] ${data.content}`;
+            messages.appendChild(item);
+        });
+
+        // =================================================================
+        // SCOREBOARD LOGIC (Receiving the live update)
+        // =================================================================
+
+        /**
+         * 2. ADD: Listener for the 'scoreboard update' event from the server.
+         * This function runs every time a new score is submitted (io.emit in scoreController).
+         */
+        socket.on('scoreboard update', function(topScores) {
+            let html = '<table>';
+            html += '<tr><th>Rank</th><th>Score</th><th>Player</th><th>Game</th></tr>';
+            
+            if (topScores.length === 0) {
+                 html = 'No scores submitted yet.';
+            } else {
+                topScores.forEach((score, index) => {
+                    // Create a row for each score object received from the server
+                    html += `<tr class="score-row">
+                                <td>#${index + 1}</td>
+                                <td>${score.score}</td>
+                                <td>${score.username}</td>
+                                <td>${score.game_title}</td>
+                             </tr>`;
+                });
+                html += '</table>';
+            }
+            
+            // Update the HTML content of the scoreboard container
+            scoresList.innerHTML = html;
+            console.log("Scoreboard updated live!");
+        });
+    </script>
+</body>
+</html>
